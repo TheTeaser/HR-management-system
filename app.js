@@ -1,14 +1,16 @@
 'use strict';
 
+let employeeArr = [];
+
 
 function Employee(employeeID, fullName, department, level, imageURL, salary) {
-    this.employeeID = employeeID;
+    this.employeeID = this.generateID();
     this.fullName = fullName;
     this.department = department;
     this.level = level;
     this.imageURL = imageURL;
-    this.salary = this.salaryCalc();
-
+    this.salary = 0;
+    employeeArr.push(this);
 }
 
 Employee.prototype.salaryCalc = function () {
@@ -34,7 +36,7 @@ Employee.prototype.salaryCalc = function () {
 
 // Employee.prototype.render = function () {
 
-    // document.write(`${this.fullName} ${this.salary} <br>`)
+// document.write(`${this.fullName} ${this.salary} <br>`)
 
 // }
 
@@ -47,50 +49,97 @@ Employee.prototype.generateID = function () {
 
 
 
-Employee.prototype.render = function(){
+Employee.prototype.render = function () {
     const container = document.getElementById('addEmployee');
 
     const divEle = document.createElement('div');
     container.appendChild(divEle);
-    
-    const empImg= document.createElement('img');
+
+    const empImg = document.createElement('img');
     divEle.appendChild(empImg);
     empImg.setAttribute('src', this.imageURL);
-    empImg.width="150";
-    empImg.height="150";
+    empImg.width = "150";
+    empImg.height = "150";
 
     const empDisc = document.createElement('p');
     divEle.appendChild(empDisc);
 
     empDisc.textContent = `Name: ${this.fullName}- ID: ${this.generateID()}- Department: ${this.department}`;
-   
+
     const empExp = document.createElement('p');
     divEle.appendChild(empExp);
-    empExp.textContent= `Level: ${this.level} - ${this.salary}`;
+    empExp.textContent = `Level: ${this.level} - ${this.salary}`;
 
 }
 
 
-let addForm= document.getElementById('HR');
+let addForm = document.getElementById('HR');
 addForm.addEventListener('submit', addNewEmp);
 
-function addNewEmp(event){
-    event.preventDefault();
-    
-    let eName= event.target.fullName.value;
-    let eDepartment= event.target.department.value;
-    let eLevel= event.target.level.value;
-    let eImg= event.target.imgURL.value;
+// function addNewEmp(event) {
+//     event.preventDefault();
 
-    let employee = new Employee(0,eName,eDepartment,eLevel,eImg);
+//     let eName = event.target.fullName.value;
+//     let eDepartment = event.target.department.value;
+//     let eLevel = event.target.level.value;
+//     let eImg = event.target.imgURL.value;
+
+//     let employee = new Employee(0, eName, eDepartment, eLevel, eImg);
+//     employee.salaryCalc();
+//     employee.render();
+
+//     //Lab09
+//     // console.log(employee);
+//     // localStorage.setItem('New employee', employee);
+//     let jsonObj = JSON.stringify(employee);
+//     localStorage.setItem('New Employee', jsonObj);
+//     // console.log(jsonObj);
+    
+// }
+function addNewEmp(event) {
+    event.preventDefault();
+
+    let eName = event.target.fullName.value;
+    let eDepartment = event.target.department.value;
+    let eLevel = event.target.level.value;
+    let eImg = event.target.imgURL.value;
+
+    let employee = new Employee(0, eName, eDepartment, eLevel, eImg);
     employee.salaryCalc();
     employee.render();
+
+    let existingData = JSON.parse(localStorage.getItem('New Employee')) || [];
+    existingData.push(employee);
+    let updatedData = JSON.stringify(existingData);
+    localStorage.setItem('New Employee', updatedData);
 }
 
+//I have set the items in local storage but now I need to retrieve it and when I retrieve it, then I need to convert it to JS as it will be retrieved in JSON format.
 
+function getJSON() {
+    let retrievedData = localStorage.getItem('New Employee');
+    console.log(retrievedData);
+    let jsObj = JSON.parse(retrievedData);
+}
+getJSON();
 
+// localStorage.setItem('userName', 'Rakan');
 
+let jsonArray = JSON.stringify(employeeArr);
+localStorage.setItem('New Employee', jsonArray);
 
+// Save data to localStorage before the page is unloaded
+window.onbeforeunload = function() {
+    localStorage.setItem('employeeArr', JSON.stringify(employeeArr));
+}
+
+// Retrieve data from localStorage after the page is loaded
+window.onload = function() {
+    let storedData = localStorage.getItem('employeeArr');
+    if (storedData) {
+        employeeArr = JSON.parse(storedData);
+    }
+}
 
 
 
